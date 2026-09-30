@@ -1,0 +1,27 @@
+---
+page_title: "{{ .ProviderShortName }} Provider"
+description: |-
+  {{ .Description | plainmarkdown | trimspace }}
+---
+
+# {{ .ProviderShortName }} Provider
+
+{{ .Description | trimspace }}
+
+Manage Capella AI Data Plane resources that are not covered by the official `couchbase-capella` provider.
+
+## Example Usage
+
+{{ tffile "examples/provider/provider.tf" }}
+
+{{ .SchemaMarkdown | trimspace }}
+
+## Authentication
+
+Set credentials in the provider block or via environment variables:
+
+| Argument | Environment variable |
+|---|---|
+| `authentication_token` | `CAPELLA_AUTHENTICATION_TOKEN` |
+| `host` | `CAPELLA_HOST` |
+| `global_api_request_timeout` | `CAPELLA_GLOBAL_API_REQUEST_TIMEOUT` |

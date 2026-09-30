@@ -1,0 +1,56 @@
+name: Acceptance Tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'tests/**'
+      - 'internal/**'
+      - 'main.go'
+      - 'go.mod'
+      - 'go.sum'
+
+permissions:
+  contents: read
+
+jobs:
+  acceptance:
+    name: Acceptance Tests
+    runs-on: ubuntu-latest
+
+    env:
+      TF_ACC: "1"
+      CAPELLA_AUTHENTICATION_TOKEN: ${{ secrets.CAPELLA_AUTHENTICATION_TOKEN }}
+      CAPELLA_HOST: ${{ secrets.CAPELLA_HOST }}
+      TF_VAR_organization_id: ${{ secrets.CAPELLA_ORGANIZATION_ID }}
+      TF_VAR_project_id: ${{ secrets.CAPELLA_PROJECT_ID }}
+      TF_VAR_cluster_id: ${{ secrets.CAPELLA_CLUSTER_ID }}
+      TF_VAR_openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+      TF_VAR_model_region: ${{ secrets.CAPELLA_MODEL_REGION }}
+      ACC_ENABLE_MODEL: ${{ vars.ACC_ENABLE_MODEL }}
+      ACC_SKIP_WORKFLOW: ${{ vars.ACC_SKIP_WORKFLOW }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+          terraform_wrapper: false
+      - name: Check Capella credentials
+        id: creds
+        run: |
+          if [ -z "$CAPELLA_AUTHENTICATION_TOKEN" ] || [ -z "$TF_VAR_organization_id" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "Capella credentials not configured; skipping acceptance tests."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Run acceptance tests
+        if: steps.creds.outputs.configured == 'true'
+        run: make testacc
