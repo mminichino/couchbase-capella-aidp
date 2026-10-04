@@ -280,16 +280,13 @@ func (r *Model) waitForModelDeploy(
 				return refreshed, nil
 			}
 			if status == "deployfailed" || status == "failed" {
-				detail := refreshed.Status.ValueString()
+				msg := fmt.Sprintf("model %s deployment failed with status %s", modelID, refreshed.Status.ValueString())
 				if !refreshed.Config.IsNull() && !refreshed.Config.IsUnknown() && refreshed.Config.ValueString() != "" {
-					detail = detail + "; config=" + refreshed.Config.ValueString()
+					msg += "; config=" + refreshed.Config.ValueString()
 				}
-				return refreshed, fmt.Errorf(
-					"model %s deployment failed with status %q "+
-						"(Capella accepted the create request but async provisioning failed; "+
-						"check Capella AI Model Service capacity/quota and that no models are stuck resuming/deploying)",
-					modelID, detail,
-				)
+				msg += " (Capella accepted the create request but async provisioning failed; " +
+					"quantization/optimization are not supported on every catalog model)"
+				return refreshed, fmt.Errorf("%s", msg)
 			}
 			tflog.Info(ctx, "waiting for model deployment", map[string]any{
 				"status":  refreshed.Status.ValueString(),

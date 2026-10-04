@@ -99,9 +99,6 @@ resource "couchbase-capella-aidp_model" "llm" {
     }
   }
 
-  quantization = "fp16"
-  optimization = "throughput"
-
   caching = jsonencode({
     enableStandard       = true
     enableConversational = true

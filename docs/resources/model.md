@@ -26,9 +26,6 @@ resource "couchbase-capella-aidp_model" "embed" {
       gpu_memory = 24
     }
   }
-
-  quantization = "fp16"
-  optimization = "throughput"
 }
 
 resource "couchbase-capella-aidp_model" "llm" {
@@ -44,9 +41,6 @@ resource "couchbase-capella-aidp_model" "llm" {
       gpu_memory = 48
     }
   }
-
-  quantization = "fp16"
-  optimization = "throughput"
 
   caching = jsonencode({
     enableStandard       = true

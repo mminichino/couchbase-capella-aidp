@@ -109,11 +109,9 @@ resource "couchbase-capella-aidp_model" "llm" {
     }
   }
 
-  quantization = "fp16"
-  optimization = "throughput"
-
-  # Conversational + semantic caching backed by the embedding model deployed above.
-  # Capella resolves semantic.embeddingModel by model name (not id).
+  # Omit quantization/optimization: Capella accepts them on create but
+  # mistral async provisioning deployFails when they are set (fp16/throughput).
+  # Conversational + semantic caching; embeddingModel is the model name, not id.
   caching = jsonencode({
     enableStandard       = true
     enableConversational = true
